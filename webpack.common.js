@@ -1,33 +1,29 @@
-const HtmlWebpackPlugin = require('html-webpack-plugin');// eslint-disable-line import/no-extraneous-dependencies
+const path = require('path');
 
 module.exports = {
-  entry: './src/index.js',
-  plugins: [new HtmlWebpackPlugin({
-    template: './src/template.html',
-  })],
+  entry: {
+    main: path.resolve(__dirname, './src/index.js'),
+    vendor: path.resolve(__dirname, './src/vendor.js'),
+  },
+
   module: {
     rules: [
-      {
-        test: /\.css$/,
-        use: [
-          'style-loader',
-          'css-loader',
-        ],
-      },
       {
         test: /\.html$/,
         use: ['html-loader'],
       },
       {
-        test: /\.(png|svg|jpg|gif)$/,
+        test: /\.(svg|png|jpg|jpeg|gif)$/,
         use: {
           loader: 'file-loader',
           options: {
             name: '[name].[hash].[ext]',
             outputPath: 'imgs',
+            publicPath: 'imgs',
           },
         },
       },
     ],
   },
+  watch: true,
 };

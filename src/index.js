@@ -1,6 +1,7 @@
 import  'phaser';
 
 const container = document.querySelector('.container')
+const gameState = {}
 function preload() {
   // Load in the sprite here!
 
@@ -13,15 +14,20 @@ function preload() {
     'sky',
     'https://content.codecademy.com/courses/learn-phaser/sky.jpg'
     );
+
   }
   
   function create() {
     
     // Put the background image here!
-  this.add.image(200, 200, 'sky')
-  // Create a sprite game object here!
-  this.add.sprite(40, 80, 'codey');
-  this.add.text(50, 500, "MY Game")
+    gameState.image = this.add.image(200, 200, 'sky')
+    // Create a sprite game object here!
+    this.add.sprite(40, 80, 'codey');
+    gameState.text = this.add.text(50, 500, "MY Game")
+}
+
+function update() {
+  gameState.text.x += 1;
 }
 
 const config = {
@@ -33,6 +39,7 @@ const config = {
   scene: {
     create,
     preload,
+    update
   },
 };
 

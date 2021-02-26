@@ -27,7 +27,7 @@ const gameState = {};
 
 function create() {
   // Add your code below:
-  gameState.player = this.physics.add.sprite(225, 450, 'codey').setScale(.8);
+  gameState.player = this.physics.add.sprite(225, 450, 'codey').setScale(0.8);
 
   // Add your code below:
   const platforms = this.physics.add.staticGroup();
@@ -48,13 +48,18 @@ function create() {
     bugs.create(xCoordinate, 10, 'bug1');
   };
 
-  const bugGenLoop = this.time.addEvent( {
+  // Add timer events to generate enemies
+  const bugGenLoop = this.time.addEvent({
     callback: bugGen,
     delay: 1000,
     callbackScope: this,
-    loop: true
-  })
+    loop: true,
+  });
 
+  // Add logic to destroy enemies upon collision with the platform
+  this.physics.add.collider( bugs, platforms, function(singleEnemy) {
+    singleEnemy.destroy();
+  })
 }
 
 function update() {

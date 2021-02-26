@@ -41,7 +41,6 @@ function create() {
 
   // Adding controls: cursors
   gameState.cursors = this.input.keyboard.createCursorKeys();
-  console.log(gameState.cursors);
 
   const bugs = this.physics.add.group();
 
@@ -72,6 +71,18 @@ function create() {
     gameState.score += 10;
 
     gameState.scoreText.setText(`Score: ${gameState.score}`);
+  });
+
+  // Losing condition
+  this.physics.add.collider(gameState.player, bugs, () => {
+    bugGenLoop.destroy();
+
+    this.physics.pause();
+
+    this.add.text(180, 250, 'Game Over', {
+      fontSize: '15px',
+      fill: '#000000',
+    });
   });
 }
 

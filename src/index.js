@@ -1,5 +1,5 @@
-import 'phaser'
-const container = document.querySelector('.container')
+import 'phaser';
+const container = document.querySelector('.container');
 function preload() {
   this.load.image(
     'bug1',
@@ -27,11 +27,15 @@ const gameState = {};
 
 function create() {
   // Add your code below:
-  gameState.codey = this.physics.add.sprite(300, 300, 'codey');
+  gameState.player = this.physics.add.sprite(300, 300, 'codey').setScale(.8);
 
   // Add your code below:
   const platforms = this.physics.add.staticGroup();
-  platforms.create(320, 350, 'platform');
+  platforms.create(320, 450, 'platform');
+
+  // Add your code below: to prevent overlap
+  this.physics.add.collider(gameState.player, platforms);
+  gameState.player.setCollideWorldBounds(true);
 }
 
 function update() {}
@@ -47,7 +51,7 @@ const config = {
     arcade: {
       gravity: { y: 300 },
       enableBody: true,
-      debug: true
+      debug: true,
     },
   },
   scene: {

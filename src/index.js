@@ -23,7 +23,9 @@ function preload() {
   );
 }
 
-const gameState = {};
+const gameState = {
+  score: 0,
+};
 
 function create() {
   // Add your code below:
@@ -56,20 +58,31 @@ function create() {
     loop: true,
   });
 
+  // Displays initial Score: 0 text
+  gameState.scoreText = this.add.text(195, 485, 'Score: 0', {
+    fontSize: '15px',
+    fill: '#000000',
+  });
+
   // Add logic to destroy enemies upon collision with the platform
-  this.physics.add.collider( bugs, platforms, function(singleEnemy) {
+  this.physics.add.collider(bugs, platforms, function (singleEnemy) {
     singleEnemy.destroy();
-  })
+
+    // Increment score here
+    gameState.score += 10;
+
+    gameState.scoreText.setText(`Score: ${gameState.score}`);
+  });
 }
 
 function update() {
   // Control velocity of the player
-  if( gameState.cursors.left.isDown) {
-    gameState.player.setVelocityX(-160)
-  } else if( gameState.cursors.right.isDown) {
-    gameState.player.setVelocityX(110)
+  if (gameState.cursors.left.isDown) {
+    gameState.player.setVelocityX(-160);
+  } else if (gameState.cursors.right.isDown) {
+    gameState.player.setVelocityX(110);
   } else {
-    gameState.player.setVelocityX(0)
+    gameState.player.setVelocityX(0);
   }
 }
 

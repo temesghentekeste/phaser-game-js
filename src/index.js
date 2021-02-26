@@ -83,6 +83,12 @@ function create() {
       fontSize: '15px',
       fill: '#000000',
     });
+
+    // Game restarts on mouse click
+    this.input.on('pointerup', () => {
+      gameState.score = 0;
+      this.scene.restart();
+    })
   });
 }
 

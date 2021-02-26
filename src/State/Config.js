@@ -1,3 +1,4 @@
+import StartScene from '../Scenes/StartScene';
 import GameScene from '../Scenes/GameScene';
 const container = document.querySelector('.container');
 
@@ -14,7 +15,7 @@ const config = {
       enableBody: true,
     },
   },
-  scene: [GameScene],
+  scene: [StartScene, GameScene],
 };
 
 export default config;

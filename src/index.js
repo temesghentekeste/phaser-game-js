@@ -28,21 +28,26 @@ const gameState = {};
 function create() {
   // Add your code below:
   gameState.codey = this.physics.add.sprite(300, 300, 'codey');
+
+  // Add your code below:
+  const platforms = this.physics.add.staticGroup();
+  platforms.create(320, 350, 'platform');
 }
 
 function update() {}
 
 const config = {
   type: Phaser.AUTO,
-  width: 450,
+  width: 650,
   height: 500,
   backgroundColor: 'b9eaff',
   parent: container,
   physics: {
     default: 'arcade',
     arcade: {
-      gravity: { y: 200 },
+      gravity: { y: 300 },
       enableBody: true,
+      debug: true
     },
   },
   scene: {

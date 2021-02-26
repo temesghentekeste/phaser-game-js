@@ -27,11 +27,11 @@ const gameState = {};
 
 function create() {
   // Add your code below:
-  gameState.player = this.physics.add.sprite(250, 300, 'codey').setScale(.8);
+  gameState.player = this.physics.add.sprite(225, 450, 'codey').setScale(.8);
 
   // Add your code below:
   const platforms = this.physics.add.staticGroup();
-  platforms.create(250, 560, 'platform');
+  platforms.create(225, 510, 'platform');
 
   // Add your code below: to prevent overlap
   this.physics.add.collider(gameState.player, platforms);
@@ -40,6 +40,15 @@ function create() {
   // Adding controls: cursors
   gameState.cursors = this.input.keyboard.createCursorKeys();
   console.log(gameState.cursors);
+
+  const bugs = this.physics.add.group();
+
+  const genBugs = () => {
+    const xCoordinate = Math.random() * 450;
+    bugs.create(xCoordinate, 10, 'bug1')
+  }
+
+  genBugs();
 
 }
 
@@ -56,8 +65,8 @@ function update() {
 
 const config = {
   type: Phaser.AUTO,
-  width: 500,
-  height: 600,
+  width: 450,
+  height: 500,
   backgroundColor: 'b9eaff',
   parent: container,
   physics: {

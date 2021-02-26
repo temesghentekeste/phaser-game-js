@@ -1,105 +1,103 @@
 import 'phaser';
-const container = document.querySelector('.container');
-function preload() {
-  this.load.image(
-    'bug1',
-    'https://content.codecademy.com/courses/learn-phaser/physics/bug_1.png'
-  );
-  this.load.image(
-    'bug2',
-    'https://content.codecademy.com/courses/learn-phaser/physics/bug_2.png'
-  );
-  this.load.image(
-    'bug3',
-    'https://content.codecademy.com/courses/learn-phaser/physics/bug_3.png'
-  );
-  this.load.image(
-    'platform',
-    'https://content.codecademy.com/courses/learn-phaser/physics/platform.png'
-  );
-  this.load.image(
-    'codey',
-    'https://content.codecademy.com/courses/learn-phaser/physics/codey.png'
-  );
-}
-
 const gameState = {
   score: 0,
 };
 
-function create() {
-  // Add your code below:
-  gameState.player = this.physics.add.sprite(225, 450, 'codey').setScale(0.8);
+const container = document.querySelector('.container')
 
-  // Add your code below:
-  const platforms = this.physics.add.staticGroup();
-  platforms.create(225, 510, 'platform');
+// Create your GameScene class below:
+class GameScene extends Phaser.Scene {
+  constructor() {
+    super({ key: 'GameScene' });
+  }
+  preload() {
+    this.load.image(
+      'bug1',
+      'https://content.codecademy.com/courses/learn-phaser/physics/bug_1.png'
+    );
+    this.load.image(
+      'bug2',
+      'https://content.codecademy.com/courses/learn-phaser/physics/bug_2.png'
+    );
+    this.load.image(
+      'bug3',
+      'https://content.codecademy.com/courses/learn-phaser/physics/bug_3.png'
+    );
+    this.load.image(
+      'platform',
+      'https://content.codecademy.com/courses/learn-phaser/physics/platform.png'
+    );
+    this.load.image(
+      'codey',
+      'https://content.codecademy.com/courses/learn-phaser/physics/codey.png'
+    );
+  }
 
-  // Add your code below: to prevent overlap
-  this.physics.add.collider(gameState.player, platforms);
-  gameState.player.setCollideWorldBounds(true);
+  create() {
+    gameState.player = this.physics.add.sprite(225, 450, 'codey').setScale(0.5);
 
-  // Adding controls: cursors
-  gameState.cursors = this.input.keyboard.createCursorKeys();
+    const platforms = this.physics.add.staticGroup();
 
-  const bugs = this.physics.add.group();
+    platforms.create(225, 490, 'platform').setScale(1, 0.3).refreshBody();
 
-  const bugGen = () => {
-    const xCoordinate = Math.random() * 450;
-    bugs.create(xCoordinate, 10, 'bug1');
-  };
-
-  // Add timer events to generate enemies
-  const bugGenLoop = this.time.addEvent({
-    callback: bugGen,
-    delay: 1000,
-    callbackScope: this,
-    loop: true,
-  });
-
-  // Displays initial Score: 0 text
-  gameState.scoreText = this.add.text(195, 485, 'Score: 0', {
-    fontSize: '15px',
-    fill: '#000000',
-  });
-
-  // Add logic to destroy enemies upon collision with the platform
-  this.physics.add.collider(bugs, platforms, function (singleEnemy) {
-    singleEnemy.destroy();
-
-    // Increment score here
-    gameState.score += 10;
-
-    gameState.scoreText.setText(`Score: ${gameState.score}`);
-  });
-
-  // Losing condition
-  this.physics.add.collider(gameState.player, bugs, () => {
-    bugGenLoop.destroy();
-
-    this.physics.pause();
-
-    this.add.text(180, 250, 'Game Over', {
+    gameState.scoreText = this.add.text(195, 485, 'Score: 0', {
       fontSize: '15px',
       fill: '#000000',
     });
 
-    // Game restarts on mouse click
-    this.input.on('pointerup', () => {
-      gameState.score = 0;
-      this.scene.restart();
-    })
-  });
-}
+    gameState.player.setCollideWorldBounds(true);
 
-function update() {
-  // Control velocity of the player
-  if (gameState.cursors.left.isDown) {
-    gameState.player.setVelocityX(-160);
-  } else if (gameState.cursors.right.isDown) {
-    gameState.player.setVelocityX(110);
-  } else {
-    gameState.player.setVelocityX(0);
+    this.physics.add.collider(gameState.player, platforms);
+
+    gameState.cursors = this.input.keyboard.createCursorKeys();
+
+    const bugs = this.physics.add.group();
+
+    const bugGen = () => {
+      const xCoord = Math.random() * 640;
+      bugs.create(xCoord, 10, 'bug1');
+    };
+
+    const bugGenLoop = this.time.addEvent({
+      delay: 100,
+      callback: bugGen,
+      callbackScope: this,
+      loop: true,
+    });
+
+    this.physics.add.collider(bugs, platforms, (bug) => {
+      bug.destroy();
+      gameState.score += 10;
+      gameState.scoreText.setText(`Score: ${gameState.score}`);
+    });
+
+    this.physics.add.collider(gameState.player, bugs, () => {
+      bugGenLoop.destroy();
+      this.physics.pause();
+      this.add.text(180, 250, 'Game Over', {
+        fontSize: '15px',
+        fill: '#000000',
+      });
+      this.add.text(152, 270, 'Click to Restart', {
+        fontSize: '15px',
+        fill: '#000000',
+      });
+
+      this.input.on('pointerup', () => {
+        gameState.score = 0;
+        this.scene.restart();
+      });
+    });
+  }
+
+  update() {
+    if (gameState.cursors.left.isDown) {
+      gameState.player.setVelocityX(-160);
+    } else if (gameState.cursors.right.isDown) {
+      gameState.player.setVelocityX(160);
+    } else {
+      gameState.player.setVelocityX(0);
+    }
   }
 }
 
@@ -112,16 +110,11 @@ const config = {
   physics: {
     default: 'arcade',
     arcade: {
-      gravity: { y: 300 },
+      gravity: { y: 200 },
       enableBody: true,
-      debug: true,
     },
   },
-  scene: {
-    preload,
-    create,
-    update,
-  },
+  scene: [GameScene],
 };
 
 const game = new Phaser.Game(config);

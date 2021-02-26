@@ -43,12 +43,17 @@ function create() {
 
   const bugs = this.physics.add.group();
 
-  const genBugs = () => {
+  const bugGen = () => {
     const xCoordinate = Math.random() * 450;
-    bugs.create(xCoordinate, 10, 'bug1')
-  }
+    bugs.create(xCoordinate, 10, 'bug1');
+  };
 
-  genBugs();
+  const bugGenLoop = this.time.addEvent( {
+    callback: bugGen,
+    delay: 1000,
+    callbackScope: this,
+    loop: true
+  })
 
 }
 

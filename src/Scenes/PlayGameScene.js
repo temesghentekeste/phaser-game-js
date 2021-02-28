@@ -6,7 +6,7 @@ export default class PlayGameScene extends Phaser.Scene {
     super('PlayGame');
     this.background = background[0];
     this.selfScale = 1;
-
+    this.nextScene = 'DiaglogueOne'
   }
   preload() {
     this.load.image('platform', 'platform.png');
@@ -14,21 +14,21 @@ export default class PlayGameScene extends Phaser.Scene {
       'player',
       'https://content.codecademy.com/courses/learn-phaser/physics/codey.png'
     );
-     this.load.image(
-       'sky',
-       'https://content.codecademy.com/courses/learn-phaser/sky.jpg'
-     );
+    this.load.image(
+      'sky',
+      'https://content.codecademy.com/courses/learn-phaser/sky.jpg'
+    );
   }
   create() {
     //background
     this.background.forEach((back) => {
-      this[back] = this.add
-        .tileSprite(0, 0, 0, 0, back)
-        .setScale(1);
+      this[back] = this.add.tileSprite(0, 0, 0, 0, back).setScale(1);
       this[back].setOrigin(0, 0);
       this[back].setScrollFactor(0);
     });
-    
+
+
+
     // group with all active platforms.
     this.platformGroup = this.add.group({
       // once a platform is removed, it's added to the pool
@@ -106,16 +106,15 @@ export default class PlayGameScene extends Phaser.Scene {
     }
   }
   update() {
-
     this.parallax = 0;
     this.background.forEach((back) => {
       this.parallax -= 0.22;
       this[back].tilePositionX -= this.parallax;
     });
-    
+
     // game over
     if (this.player.y > game.config.height) {
-      this.scene.start('PlayGame');
+      this.scene.start('GameOver', { previousScene: this.scene });
     }
     this.player.x = gameState.playerStartPosition;
 

@@ -6,7 +6,8 @@ export default class PlayGameScene extends Phaser.Scene {
     super('PlayGame');
     this.background = background[0];
     this.selfScale = 1;
-    this.nextScene = 'DiaglogueOne'
+    this.nextScene = 'DiaglogueOne';
+    this.seconds = 80000;
   }
   preload() {
     this.load.image('platform', 'platform.png');
@@ -27,7 +28,42 @@ export default class PlayGameScene extends Phaser.Scene {
       this[back].setScrollFactor(0);
     });
 
+    // score
+    this.count = 0;
+    gameState.score = 0;
 
+    this.time.addEvent({
+      delay: this.seconds,
+      callback() {
+        this.scene.pause();
+        clearInterval(this.idInterval);
+        this.scene.start(this.nextScene);
+      },
+      callbackScope: this,
+    });
+
+    this.timeText = this.add.text(550, 16, 'Good Luck!', {
+      fontSize: '32px',
+      fill: '#000',
+    });
+
+    this.scoreText = this.add.text(10, 10, `Score: ${gameState.score}`, {
+      fontSize: '2rem',
+      fill: '#000000',
+    });
+
+    this.idInterval = setInterval(() => {
+      const time = this.setMinutes(this.seconds);
+      this.timeText.text = time;
+      this.count += 1000;
+      if (this.count !== 0 && this.count % 2 === 0) {
+        gameState.score += 5;
+        console.log(gameState.score);
+        this.scoreText.text = `Score: ${gameState.score}`;
+      }
+
+      this.seconds -= 1000;
+    }, 1000);
 
     // group with all active platforms.
     this.platformGroup = this.add.group({
@@ -115,6 +151,8 @@ export default class PlayGameScene extends Phaser.Scene {
     // game over
     if (this.player.y > game.config.height) {
       this.scene.start('GameOver', { previousScene: this.scene });
+      clearInterval(this.idInterval);
+
     }
     this.player.x = gameState.playerStartPosition;
 
@@ -141,5 +179,12 @@ export default class PlayGameScene extends Phaser.Scene {
         game.config.width + nextPlatformWidth / 2
       );
     }
+  }
+
+  setMinutes(mseconds) {
+    this.newSeconds = mseconds / 1000;
+    const minutes = Math.floor(this.newSeconds / 60);
+    const time = `${minutes} : ${this.newSeconds % 60}`;
+    return time;
   }
 }

@@ -1,36 +1,34 @@
-import 'phaser';
 import gameState from '../Config/gameState';
 import background from '../utils/background';
 
-export default class GameScene extends Phaser.Scene {
+export default class PlayGameScene extends Phaser.Scene {
   constructor() {
-    super('Game');
+    super('PlayGame');
     this.background = background[0];
-    console.log(this.background);
-    this.parallax = 0;
-  }
+    this.selfScale = 1;
 
+  }
   preload() {
-    this.load.image('platform', 'src/assets/ui/platform.png');
-    this.load.image('player', 'src/assets/ui/player.png');
-    // Load in the background image here!
+    this.load.image('platform', 'platform.png');
     this.load.image(
-      'sky',
-      'https://content.codecademy.com/courses/learn-phaser/sky.jpg'
+      'player',
+      'https://content.codecademy.com/courses/learn-phaser/physics/codey.png'
     );
+     this.load.image(
+       'sky',
+       'https://content.codecademy.com/courses/learn-phaser/sky.jpg'
+     );
   }
-
   create() {
-    this.add.image(200, 200, 'sky');
-
     //background
     this.background.forEach((back) => {
       this[back] = this.add
         .tileSprite(0, 0, 0, 0, back)
-        .setScale(this.selfScale);
+        .setScale(1);
       this[back].setOrigin(0, 0);
       this[back].setScrollFactor(0);
     });
+    
     // group with all active platforms.
     this.platformGroup = this.add.group({
       // once a platform is removed, it's added to the pool
@@ -55,26 +53,17 @@ export default class GameScene extends Phaser.Scene {
 
     // adding the player;
     this.player = this.physics.add.sprite(
-      gameOptions.playerStartPosition,
+      gameState.playerStartPosition,
       game.config.height / 2,
       'player'
     );
-    this.player.setGravityY(gameOptions.playerGravity);
+    this.player.setGravityY(gameState.playerGravity);
 
     // setting collisions between the player and the platform group
     this.physics.add.collider(this.player, this.platformGroup);
 
     // checking for input
     this.input.on('pointerdown', this.jump, this);
-  }
-
-  // update
-  update() {
-    this.parallax = 0;
-    this.background.forEach((back) => {
-      this.parallax -= 0.22;
-      this[back].tilePositionX -= this.parallax;
-    });
   }
 
   // the core of the script: platform are added from the pool or created on the fly
@@ -93,13 +82,13 @@ export default class GameScene extends Phaser.Scene {
         'platform'
       );
       platform.setImmovable(true);
-      platform.setVelocityX(gameOptions.platformStartSpeed * -1);
+      platform.setVelocityX(gameState.platformStartSpeed * -1);
       this.platformGroup.add(platform);
     }
     platform.displayWidth = platformWidth;
     this.nextPlatformDistance = Phaser.Math.Between(
-      gameOptions.spawnRange[0],
-      gameOptions.spawnRange[1]
+      gameState.spawnRange[0],
+      gameState.spawnRange[1]
     );
   }
 
@@ -116,19 +105,42 @@ export default class GameScene extends Phaser.Scene {
       this.playerJumps++;
     }
   }
-}
+  update() {
 
-function resize() {
-  let canvas = document.querySelector('canvas');
-  let windowWidth = window.innerWidth;
-  let windowHeight = window.innerHeight;
-  let windowRatio = windowWidth / windowHeight;
-  let gameRatio = game.config.width / game.config.height;
-  if (windowRatio < gameRatio) {
-    canvas.style.width = windowWidth + 'px';
-    canvas.style.height = windowWidth / gameRatio + 'px';
-  } else {
-    canvas.style.width = windowHeight * gameRatio + 'px';
-    canvas.style.height = windowHeight + 'px';
+    this.parallax = 0;
+    this.background.forEach((back) => {
+      this.parallax -= 0.22;
+      this[back].tilePositionX -= this.parallax;
+    });
+    
+    // game over
+    if (this.player.y > game.config.height) {
+      this.scene.start('PlayGame');
+    }
+    this.player.x = gameState.playerStartPosition;
+
+    // recycling platforms
+    let minDistance = game.config.width;
+    this.platformGroup.getChildren().forEach(function (platform) {
+      let platformDistance =
+        game.config.width - platform.x - platform.displayWidth / 2;
+      minDistance = Math.min(minDistance, platformDistance);
+      if (platform.x < -platform.displayWidth / 2) {
+        this.platformGroup.killAndHide(platform);
+        this.platformGroup.remove(platform);
+      }
+    }, this);
+
+    // adding new platforms
+    if (minDistance > this.nextPlatformDistance) {
+      var nextPlatformWidth = Phaser.Math.Between(
+        gameState.platformSizeRange[0],
+        gameState.platformSizeRange[1]
+      );
+      this.addPlatform(
+        nextPlatformWidth,
+        game.config.width + nextPlatformWidth / 2
+      );
+    }
   }
 }
